@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"bytes"
-	"html/template"
 	"net/http"
 	"path/filepath"
+	"text/template"
+
+	"github.com/djoudi-cherfi/go-mini-project-web/config"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -19,12 +21,14 @@ func Contact(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "contact")
 }
 
-func renderTemplate(w http.ResponseWriter, tmplName string) {
-	templateCache, err := createTemplateCache()
+var appConfig *config.Config
 
-	if err != nil {
-		panic(err)
-	}
+func CreateTemplates(app *config.Config) {
+	appConfig = app
+}
+
+func renderTemplate(w http.ResponseWriter, tmplName string) {
+	templateCache := appConfig.TemplateCache
 
 	// templateCache["home.page.tmpl"]
 	tmpl, ok := templateCache[tmplName+".page.tmpl"]
@@ -39,7 +43,7 @@ func renderTemplate(w http.ResponseWriter, tmplName string) {
 	buffer.WriteTo(w)
 }
 
-func createTemplateCache() (map[string]*template.Template, error) {
+func CreateTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
 	pages, err := filepath.Glob("./ui/html/templates/*.page.tmpl")
