@@ -7,18 +7,29 @@ import (
 	"text/template"
 
 	"github.com/djoudi-cherfi/go-mini-project-web/config"
+	"github.com/djoudi-cherfi/go-mini-project-web/models"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "home")
+	names := make(map[string]string)
+	names["owner"] = "John"
+
+	renderTemplate(w, "home", &models.TemplateData{
+		StringData: names,
+	})
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "about")
+	age := make(map[string]int)
+	age["owner"] = 30
+
+	renderTemplate(w, "about", &models.TemplateData{
+		IntData: age,
+	})
 }
 
 func Contact(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "contact")
+	renderTemplate(w, "contact", &models.TemplateData{})
 }
 
 var appConfig *config.Config
@@ -27,7 +38,7 @@ func CreateTemplates(app *config.Config) {
 	appConfig = app
 }
 
-func renderTemplate(w http.ResponseWriter, tmplName string) {
+func renderTemplate(w http.ResponseWriter, tmplName string, td *models.TemplateData) {
 	templateCache := appConfig.TemplateCache
 
 	// templateCache["home.page.tmpl"]
@@ -39,7 +50,7 @@ func renderTemplate(w http.ResponseWriter, tmplName string) {
 	}
 
 	buffer := new(bytes.Buffer)
-	tmpl.Execute(buffer, nil)
+	tmpl.Execute(buffer, td)
 	buffer.WriteTo(w)
 }
 
